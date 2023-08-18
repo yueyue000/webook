@@ -6,4 +6,14 @@ type User struct {
 	Password string
 }
 
+// Encrypt 加密, 是领域对象的事情
+func (u User) Encrypt() {
+
+}
+
+// ComparePassword 比较密码是否正确
+func (u User) ComparePassword() {
+
+}
+
 type Address struct{}
