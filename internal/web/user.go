@@ -1,6 +1,7 @@
 package web
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator"
@@ -14,12 +15,12 @@ type UserHandler struct {
 	svc *service.UserService
 }
 
-func (c *UserHandler) RegisterRoutes(s *gin.Engine) {
+func (u *UserHandler) RegisterRoutes(s *gin.Engine) {
 	ug := s.Group("/users")
-	ug.POST("/signup", c.SignUp)
-	ug.POST("/login", c.Login)
-	ug.POST("/edit", c.Edit)
-	ug.POST("/profile", c.Profile)
+	ug.POST("/signup", u.SignUp)
+	ug.POST("/login", u.Login)
+	ug.POST("/edit", u.Edit)
+	ug.POST("/profile", u.Profile)
 }
 
 func NewUserHandler(svc *service.UserService) *UserHandler {
@@ -28,7 +29,7 @@ func NewUserHandler(svc *service.UserService) *UserHandler {
 	}
 }
 
-func (c *UserHandler) SignUp(ctx *gin.Context) {
+func (u *UserHandler) SignUp(ctx *gin.Context) {
 	type signUpReq struct {
 		Email    string `json:"email" validate:"email"`
 		Password string `json:"password" validate:"min=6,max=16"`
@@ -48,10 +49,15 @@ func (c *UserHandler) SignUp(ctx *gin.Context) {
 		return
 	}
 
-	err = c.svc.SignUp(ctx, domain.User{
+	err = u.svc.SignUp(ctx, domain.User{
 		Email:    req.Email,
 		Password: req.Password,
 	})
+	if errors.Is(err, service.ErrUserDuplicateEmail) {
+		ctx.String(http.StatusOK, "邮箱冲突")
+		return
+	}
+
 	if err != nil {
 		ctx.String(http.StatusOK, "系统异常")
 		return
@@ -61,9 +67,34 @@ func (c *UserHandler) SignUp(ctx *gin.Context) {
 	fmt.Printf("req:%+v", req)
 }
 
-func (c *UserHandler) Login(ctx *gin.Context) {}
+func (u *UserHandler) Login(ctx *gin.Context) {
+	type loginReq struct {
+		Email    string `json:"email" validate:"email"`
+		Password string `json:"password" validate:"required"`
+	}
 
-func (c *UserHandler) Edit(ctx *gin.Context) {
+	var req loginReq
+	if err := ctx.Bind(&req); err != nil {
+		ctx.JSON(499, gin.H{"msg": err.Error()})
+		return
+	}
+	err := u.svc.Login(ctx, domain.User{
+		Email:    req.Email,
+		Password: req.Password,
+	})
+	if err == service.ErrInvalidUserOrPassword {
+		ctx.String(http.StatusOK, "用户名或密码错误")
+		return
+	}
+	if err != nil {
+		ctx.String(http.StatusOK, "系统错误")
+		return
+	}
+	ctx.String(http.StatusOK, "登录成功")
+	return
+}
+
+func (u *UserHandler) Edit(ctx *gin.Context) {
 	type editReq struct {
 		Nick     string `json:"nick" validate:"min=0,max=16"`
 		Birthday string `json:"birthday" validate:"datetime=2006-01-02"`
@@ -83,6 +114,6 @@ func (c *UserHandler) Edit(ctx *gin.Context) {
 	ctx.String(http.StatusOK, "修改成功")
 }
 
-func (c *UserHandler) Profile(ctx *gin.Context) {
+func (u *UserHandler) Profile(ctx *gin.Context) {
 
 }

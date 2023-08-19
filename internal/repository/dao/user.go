@@ -10,6 +10,7 @@ import "gorm.io/gorm"
 
 var (
 	ErrUserDuplicateEmail = errors.New("邮箱冲突")
+	ErrUserNotFound       = gorm.ErrRecordNotFound
 )
 
 type UserDAO struct {
@@ -34,6 +35,12 @@ func (dao *UserDAO) Insert(ctx context.Context, u User) error {
 		}
 	}
 	return err
+}
+
+func (dao *UserDAO) SelectByEmail(ctx context.Context, email string) (User, error) {
+	var user User
+	err := dao.db.WithContext(ctx).Where("email=?", email).First(&user).Error
+	return user, err
 }
 
 // User 与数据库表结构对应。叫法比较多，如：entity、model、PO(Persistent object)
