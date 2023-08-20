@@ -65,6 +65,9 @@ func initWebServer() *gin.Engine {
 	store := cookie.NewStore([]byte("secret"))        // session存储使用的存储引擎
 	server.Use(sessions.Sessions("mysession", store)) // 设置到cookie的name和value
 
-	server.Use(middleware.NewLoginMiddlewareBuilder().Build())
+	server.Use(middleware.NewLoginMiddlewareBuilder().
+		IgnorePaths("users/signup").
+		IgnorePaths("users/login").
+		Build())
 	return server
 }
