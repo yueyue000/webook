@@ -3,6 +3,7 @@ package web
 import (
 	"errors"
 	"fmt"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator"
 	"github.com/yueyue000/webook/internal/domain"
@@ -20,7 +21,7 @@ func (u *UserHandler) RegisterRoutes(s *gin.Engine) {
 	ug.POST("/signup", u.SignUp)
 	ug.POST("/login", u.Login)
 	ug.POST("/edit", u.Edit)
-	ug.POST("/profile", u.Profile)
+	ug.GET("/profile", u.Profile)
 }
 
 func NewUserHandler(svc *service.UserService) *UserHandler {
@@ -78,7 +79,7 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 		ctx.JSON(499, gin.H{"msg": err.Error()})
 		return
 	}
-	err := u.svc.Login(ctx, domain.User{
+	user, err := u.svc.Login(ctx, domain.User{
 		Email:    req.Email,
 		Password: req.Password,
 	})
@@ -90,7 +91,15 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 		ctx.String(http.StatusOK, "系统错误")
 		return
 	}
-	ctx.String(http.StatusOK, "登录成功")
+
+	// 登录成功，获取sid, 设置sid
+	session := sessions.Default(ctx)
+	session.Set("userID", user.ID) // 只能设置一次，不能设置多个
+	session.Save()
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"msg": "登录成功",
+	})
 	return
 }
 
@@ -115,5 +124,5 @@ func (u *UserHandler) Edit(ctx *gin.Context) {
 }
 
 func (u *UserHandler) Profile(ctx *gin.Context) {
-
+	ctx.String(http.StatusOK, "这里是资料")
 }

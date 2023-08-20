@@ -45,7 +45,7 @@ func (dao *UserDAO) SelectByEmail(ctx context.Context, email string) (User, erro
 
 // User 与数据库表结构对应。叫法比较多，如：entity、model、PO(Persistent object)
 type User struct {
-	Id       int64  `gorm:"primaryKey,autoIncrement"` // 自增，主键
+	ID       int64  `gorm:"primaryKey,autoIncrement"` // 自增，主键
 	Email    string `gorm:"unique"`                   // 唯一索引
 	Password string
 	Ctime    int64 // 创建时间，毫秒数

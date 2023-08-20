@@ -2,11 +2,14 @@ package main
 
 import (
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/yueyue000/webook/internal/repository"
 	"github.com/yueyue000/webook/internal/repository/dao"
 	"github.com/yueyue000/webook/internal/service"
 	"github.com/yueyue000/webook/internal/web"
+	"github.com/yueyue000/webook/internal/web/middleware"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"strings"
@@ -58,5 +61,10 @@ func initWebServer() *gin.Engine {
 		},
 		MaxAge: 12 * time.Hour, // preflity请求有效期，可以调小一点对应响应头：Access-Control-Max-Age
 	}))
+
+	store := cookie.NewStore([]byte("secret"))        // session存储使用的存储引擎
+	server.Use(sessions.Sessions("mysession", store)) // 设置到cookie的name和value
+
+	server.Use(middleware.NewLoginMiddlewareBuilder().Build())
 	return server
 }

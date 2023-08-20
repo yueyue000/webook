@@ -2,6 +2,7 @@ package domain
 
 // User 领域对象,是DDD中的entity，有的叫BO(Business Object)
 type User struct {
+	ID       int64
 	Email    string
 	Password string
 }
