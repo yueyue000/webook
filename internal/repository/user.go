@@ -50,7 +50,6 @@ func (r *UserRepository) FindByID(ctx context.Context, id int64) (domain.User, e
 	}
 	birthday := u.Birthday.Format("2006-01-02")
 	return domain.User{
-		Email:       u.Email,
 		Nick:        u.Nick,
 		Birthday:    birthday,
 		Description: u.Description,
