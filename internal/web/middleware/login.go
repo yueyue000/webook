@@ -38,5 +38,11 @@ func (l *LoginMiddleware) Build() gin.HandlerFunc {
 			ctx.AbortWithStatus(http.StatusUnauthorized) // 没权限
 			return
 		}
+		uid, ok := id.(int64)
+		if !ok {
+			ctx.AbortWithStatus(http.StatusUnauthorized) // 没权限
+			return
+		}
+		ctx.Set("uid", uid)
 	}
 }

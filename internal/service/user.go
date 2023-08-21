@@ -46,3 +46,11 @@ func (svc *UserService) Login(ctx context.Context, u domain.User) (domain.User, 
 	}
 	return userInfo, nil
 }
+
+func (svc *UserService) Edit(ctx context.Context, u domain.User) error {
+	err := svc.repo.UpdateByID(ctx, u)
+	if err != nil {
+		return err
+	}
+	return nil
+}

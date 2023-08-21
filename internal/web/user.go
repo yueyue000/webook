@@ -9,6 +9,7 @@ import (
 	"github.com/yueyue000/webook/internal/domain"
 	"github.com/yueyue000/webook/internal/service"
 	"net/http"
+	"time"
 )
 
 // UserHandler 定义所有跟user有关的路由
@@ -39,14 +40,14 @@ func (u *UserHandler) SignUp(ctx *gin.Context) {
 	var req signUpReq
 	// Bind方法会根据Content-Type来解析请求参数到req里面，解析出错会直接写回400的错误
 	if err := ctx.Bind(&req); err != nil {
-		ctx.JSON(499, gin.H{"msg": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
 		return
 	}
 
 	validate := validator.New()
 	err := validate.Struct(req)
 	if err != nil {
-		ctx.JSON(499, gin.H{"msg": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
 		return
 	}
 
@@ -76,7 +77,7 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 
 	var req loginReq
 	if err := ctx.Bind(&req); err != nil {
-		ctx.JSON(499, gin.H{"msg": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
 		return
 	}
 	user, err := u.svc.Login(ctx, domain.User{
@@ -105,19 +106,47 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 
 func (u *UserHandler) Edit(ctx *gin.Context) {
 	type editReq struct {
-		Nick     string `json:"nick" validate:"min=0,max=16"`
-		Birthday string `json:"birthday" validate:"datetime=2006-01-02"`
+		Nick        string `json:"nick" validate:"required,max=16"`
+		Birthday    string `json:"birthday" validate:"required"`
+		Description string `json:"description" validate:"max=256"`
 	}
 
 	var req editReq
 	if err := ctx.Bind(&req); err != nil {
-		ctx.JSON(499, gin.H{"msg": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
 		return
 	}
 	validate := validator.New()
 	err := validate.Struct(req)
 	if err != nil {
-		ctx.JSON(499, gin.H{"msg": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
+		return
+	}
+
+	uidAny, ok := ctx.Get("uid")
+	if !ok {
+		ctx.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+	uid, ok := uidAny.(int64)
+	if !ok {
+		ctx.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	birthday, err := time.Parse("2006-01-02", req.Birthday)
+	if err != nil {
+		ctx.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+	err = u.svc.Edit(ctx, domain.User{
+		ID:          uid,
+		Nick:        req.Nick,
+		Birthday:    birthday,
+		Description: req.Description,
+	})
+	if err != nil {
+		ctx.String(http.StatusOK, "修改失败")
 		return
 	}
 	ctx.String(http.StatusOK, "修改成功")

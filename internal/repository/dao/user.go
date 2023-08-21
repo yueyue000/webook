@@ -43,11 +43,20 @@ func (dao *UserDAO) SelectByEmail(ctx context.Context, email string) (User, erro
 	return user, err
 }
 
+func (dao *UserDAO) UpdateByID(ctx context.Context, user User) error {
+	user.Utime = time.Now().UnixMilli()
+	err := dao.db.WithContext(ctx).Where("id=?", user.ID).Updates(&user).Error
+	return err
+}
+
 // User 与数据库表结构对应。叫法比较多，如：entity、model、PO(Persistent object)
 type User struct {
-	ID       int64  `gorm:"primaryKey,autoIncrement"` // 自增，主键
-	Email    string `gorm:"unique"`                   // 唯一索引
-	Password string
-	Ctime    int64 // 创建时间，毫秒数
-	Utime    int64 // 更新时间，毫秒数
+	ID          int64  `gorm:"primaryKey,autoIncrement"` // 自增，主键
+	Email       string `gorm:"unique"`                   // 唯一索引
+	Password    string
+	Nick        string
+	Birthday    time.Time
+	Description string
+	Ctime       int64 // 创建时间，毫秒数
+	Utime       int64 // 更新时间，毫秒数
 }
