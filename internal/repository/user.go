@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/yueyue000/webook/internal/domain"
 	"github.com/yueyue000/webook/internal/repository/dao"
+	"time"
 )
 
 var (
@@ -42,14 +43,32 @@ func (r *UserRepository) FindByEmail(ctx context.Context, email string) (domain.
 	}, nil
 }
 
+func (r *UserRepository) FindByID(ctx context.Context, id int64) (domain.User, error) {
+	u, err := r.dao.SelectByID(ctx, id)
+	if err != nil {
+		return domain.User{}, err
+	}
+	birthday := u.Birthday.Format("2006-01-02")
+	return domain.User{
+		Email:       u.Email,
+		Nick:        u.Nick,
+		Birthday:    birthday,
+		Description: u.Description,
+	}, nil
+}
+
 func (r *UserRepository) UpdateByID(ctx context.Context, userDomain domain.User) error {
+	birthday, err := time.Parse("2006-01-02", userDomain.Birthday)
+	if err != nil {
+		return err
+	}
 	user := dao.User{
 		ID:          userDomain.ID,
 		Nick:        userDomain.Nick,
-		Birthday:    userDomain.Birthday,
+		Birthday:    &birthday,
 		Description: userDomain.Description,
 	}
-	err := r.dao.UpdateByID(ctx, user)
+	err = r.dao.UpdateByID(ctx, user)
 	if err != nil {
 		return err
 	}

@@ -9,7 +9,7 @@ import (
 	"github.com/yueyue000/webook/internal/domain"
 	"github.com/yueyue000/webook/internal/service"
 	"net/http"
-	"time"
+	"strconv"
 )
 
 // UserHandler 定义所有跟user有关的路由
@@ -123,26 +123,17 @@ func (u *UserHandler) Edit(ctx *gin.Context) {
 		return
 	}
 
-	uidAny, ok := ctx.Get("uid")
-	if !ok {
-		ctx.AbortWithStatus(http.StatusUnauthorized)
-		return
-	}
-	uid, ok := uidAny.(int64)
-	if !ok {
+	uidStr := ctx.Param("uid")
+	uid, err := strconv.ParseInt(uidStr, 10, 64)
+	if err != nil {
 		ctx.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
-	birthday, err := time.Parse("2006-01-02", req.Birthday)
-	if err != nil {
-		ctx.AbortWithStatus(http.StatusBadRequest)
-		return
-	}
 	err = u.svc.Edit(ctx, domain.User{
 		ID:          uid,
 		Nick:        req.Nick,
-		Birthday:    birthday,
+		Birthday:    req.Birthday,
 		Description: req.Description,
 	})
 	if err != nil {
@@ -153,5 +144,15 @@ func (u *UserHandler) Edit(ctx *gin.Context) {
 }
 
 func (u *UserHandler) Profile(ctx *gin.Context) {
-	ctx.String(http.StatusOK, "这里是资料")
+	uidStr := ctx.Param("uid")
+	uid, err := strconv.ParseInt(uidStr, 10, 64)
+	if err != nil {
+		ctx.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+	userDomain, err := u.svc.Profile(ctx, uid)
+	if err != nil {
+		ctx.AbortWithStatus(http.StatusInternalServerError)
+	}
+	ctx.JSON(http.StatusOK, userDomain)
 }

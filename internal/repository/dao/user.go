@@ -43,6 +43,12 @@ func (dao *UserDAO) SelectByEmail(ctx context.Context, email string) (User, erro
 	return user, err
 }
 
+func (dao *UserDAO) SelectByID(ctx context.Context, id int64) (User, error) {
+	var user User
+	err := dao.db.WithContext(ctx).Where("id=?", id).First(&user).Error
+	return user, err
+}
+
 func (dao *UserDAO) UpdateByID(ctx context.Context, user User) error {
 	user.Utime = time.Now().UnixMilli()
 	err := dao.db.WithContext(ctx).Where("id=?", user.ID).Updates(&user).Error
@@ -55,7 +61,7 @@ type User struct {
 	Email       string `gorm:"unique"`                   // 唯一索引
 	Password    string
 	Nick        string
-	Birthday    time.Time
+	Birthday    *time.Time
 	Description string
 	Ctime       int64 // 创建时间，毫秒数
 	Utime       int64 // 更新时间，毫秒数

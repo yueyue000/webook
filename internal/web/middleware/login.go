@@ -4,6 +4,7 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 type LoginMiddleware struct {
@@ -43,6 +44,6 @@ func (l *LoginMiddleware) Build() gin.HandlerFunc {
 			ctx.AbortWithStatus(http.StatusUnauthorized) // 没权限
 			return
 		}
-		ctx.Set("uid", uid)
+		ctx.AddParam("uid", strconv.FormatInt(uid, 10))
 	}
 }
