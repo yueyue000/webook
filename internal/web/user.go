@@ -95,13 +95,20 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 
 	// 登录成功，获取sid, 设置sid
 	session := sessions.Default(ctx)
-	session.Set("userID", user.ID) // 只能设置一次，不能设置多个
+	session.Set("uid", user.ID) // 只能设置一次，不能设置多个
+	session.Options(sessions.Options{
+		MaxAge: 30,
+	}) // 用来控制cookie的
 	session.Save()
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"msg": "登录成功",
 	})
 	return
+}
+
+func (u *UserHandler) Logout(ctx *gin.Context) {
+
 }
 
 func (u *UserHandler) Edit(ctx *gin.Context) {

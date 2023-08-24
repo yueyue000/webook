@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
+	"github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/gin"
 	"github.com/yueyue000/webook/internal/repository"
 	"github.com/yueyue000/webook/internal/repository/dao"
@@ -62,12 +62,16 @@ func initWebServer() *gin.Engine {
 		MaxAge: 12 * time.Hour, // preflity请求有效期，可以调小一点对应响应头：Access-Control-Max-Age
 	}))
 
-	store := cookie.NewStore([]byte("secret"))        // session存储使用的存储引擎
+	//store := cookie.NewStore([]byte("secret"))        // session存储使用的存储引擎
+	store, err := redis.NewStore(16, "tcp", "localhost:6379", "", []byte("dqC2oDoZ2noDoZ2n"), []byte("jW5FOm21NZoDoZ2n"))
+	if err != nil {
+		panic(err)
+	}
 	server.Use(sessions.Sessions("mysession", store)) // 设置到cookie的name和value
 
 	server.Use(middleware.NewLoginMiddlewareBuilder().
-		IgnorePaths("users/signup").
-		IgnorePaths("users/login").
+		IgnorePaths("/users/signup").
+		IgnorePaths("/users/login").
 		Build())
 	return server
 }

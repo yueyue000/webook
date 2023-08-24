@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 type LoginMiddleware struct {
@@ -22,6 +23,7 @@ func (l *LoginMiddleware) IgnorePaths(path string) *LoginMiddleware {
 
 // Build builder设计模式, 方便后续扩展
 func (l *LoginMiddleware) Build() gin.HandlerFunc {
+	//gob.Register(time.Now()) // 当编解码中有一个字段是interface{}的时候，需要对interface{}可能产生的类型进行注册
 	return func(ctx *gin.Context) {
 		// 不需要session校验
 		for _, path := range l.paths {
@@ -34,7 +36,7 @@ func (l *LoginMiddleware) Build() gin.HandlerFunc {
 			ctx.AbortWithStatus(http.StatusUnauthorized) // 没权限
 			return
 		}
-		id := session.Get("userID")
+		id := session.Get("uid")
 		if id == nil {
 			ctx.AbortWithStatus(http.StatusUnauthorized) // 没权限
 			return
@@ -44,6 +46,36 @@ func (l *LoginMiddleware) Build() gin.HandlerFunc {
 			ctx.AbortWithStatus(http.StatusUnauthorized) // 没权限
 			return
 		}
-		ctx.AddParam("uid", strconv.FormatInt(uid, 10))
+		ctx.AddParam("uid", strconv.FormatInt(uid, 10)) // 将uid写入param方便后面使用
+
+		// 刷新session
+		updateTime := session.Get("update_time")
+		session.Set("uid", id)
+		session.Options(sessions.Options{
+			MaxAge: 30,
+		})
+		now := time.Now()
+		if updateTime == nil { // 刚登陆，还未刷新过
+			session.Set("update_time", now)
+			err := session.Save()
+			if err != nil {
+				panic(err)
+			}
+			return
+		}
+
+		updateTimeVal, ok := updateTime.(time.Time)
+		if !ok {
+			ctx.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+		if now.Sub(updateTimeVal) > time.Second*10 {
+			session.Set("update_time", now)
+			err := session.Save()
+			if err != nil {
+				panic(err)
+			}
+			return
+		}
 	}
 }
