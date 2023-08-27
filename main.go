@@ -69,7 +69,7 @@ func initWebServer() *gin.Engine {
 	}
 	server.Use(sessions.Sessions("mysession", store)) // 设置到cookie的name和value
 
-	server.Use(middleware.NewLoginMiddlewareBuilder().
+	server.Use(middleware.NewLoginJWTMiddlewareBuilder().
 		IgnorePaths("/users/signup").
 		IgnorePaths("/users/login").
 		Build())

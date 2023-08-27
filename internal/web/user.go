@@ -106,7 +106,7 @@ func (u *UserHandler) LoginJWT(ctx *gin.Context) {
 		ctx.String(http.StatusInternalServerError, "系统错误")
 		return
 	}
-	ctx.Header("x-jwt-token", tokenStr)
+	ctx.Header("X-Jwt-Token", tokenStr)
 	ctx.JSON(http.StatusOK, gin.H{
 		"msg": "登录成功",
 	})

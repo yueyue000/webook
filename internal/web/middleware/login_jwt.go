@@ -2,10 +2,9 @@ package middleware
 
 import (
 	"encoding/gob"
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -33,52 +32,20 @@ func (l *LoginJWTMiddleware) Build() gin.HandlerFunc {
 				return
 			}
 		}
-		session := sessions.Default(ctx)
-		if session == nil {
-			ctx.AbortWithStatus(http.StatusUnauthorized) // 没权限
+		tokenStr := ctx.GetHeader("X-Jwt-Token")
+		if tokenStr == "" {
+			ctx.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
-		id := session.Get("uid")
-		if id == nil {
-			ctx.AbortWithStatus(http.StatusUnauthorized) // 没权限
-			return
-		}
-		uid, ok := id.(int64)
-		if !ok {
-			ctx.AbortWithStatus(http.StatusUnauthorized) // 没权限
-			return
-		}
-
-		// 将uid写入param方便后面使用
-		ctx.AddParam("uid", strconv.FormatInt(uid, 10))
-
-		// 刷新session
-		updateTime := session.Get("update_time")
-		session.Set("uid", id)
-		session.Options(sessions.Options{
-			MaxAge: 30,
+		token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+			return []byte("moyn8y9abnd7q4zkq2m73yw8tu9j5ixm"), nil
 		})
-		now := time.Now()
-		if updateTime == nil { // 刚登陆，还未刷新过
-			session.Set("update_time", now)
-			err := session.Save()
-			if err != nil {
-				panic(err)
-			}
+		if err != nil {
+			ctx.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
-
-		updateTimeVal, ok := updateTime.(time.Time)
-		if !ok {
-			ctx.AbortWithStatus(http.StatusInternalServerError)
-			return
-		}
-		if now.Sub(updateTimeVal) > time.Second*10 {
-			session.Set("update_time", now)
-			err := session.Save()
-			if err != nil {
-				panic(err)
-			}
+		if token == nil || !token.Valid {
+			ctx.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
 	}
