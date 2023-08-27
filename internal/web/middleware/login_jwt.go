@@ -9,21 +9,22 @@ import (
 	"time"
 )
 
-type LoginMiddleware struct {
+// LoginJWTMiddleware JWT登录校验
+type LoginJWTMiddleware struct {
 	paths []string
 }
 
-func NewLoginMiddlewareBuilder() *LoginMiddleware {
-	return &LoginMiddleware{}
+func NewLoginJWTMiddlewareBuilder() *LoginJWTMiddleware {
+	return &LoginJWTMiddleware{}
 }
 
-func (l *LoginMiddleware) IgnorePaths(path string) *LoginMiddleware {
+func (l *LoginJWTMiddleware) IgnorePaths(path string) *LoginJWTMiddleware {
 	l.paths = append(l.paths, path)
 	return l
 }
 
 // Build builder设计模式, 方便后续扩展
-func (l *LoginMiddleware) Build() gin.HandlerFunc {
+func (l *LoginJWTMiddleware) Build() gin.HandlerFunc {
 	gob.Register(time.Now()) // 当编解码中有一个字段是interface{}的时候，需要对interface{}可能产生的类型进行注册
 	return func(ctx *gin.Context) {
 		// 不需要session校验

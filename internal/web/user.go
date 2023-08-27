@@ -6,6 +6,7 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/yueyue000/webook/internal/domain"
 	"github.com/yueyue000/webook/internal/service"
 	"net/http"
@@ -20,7 +21,8 @@ type UserHandler struct {
 func (u *UserHandler) RegisterRoutes(s *gin.Engine) {
 	ug := s.Group("/users")
 	ug.POST("/signup", u.SignUp)
-	ug.POST("/login", u.Login)
+	//ug.POST("/login", u.Login)
+	ug.POST("/login", u.LoginJWT)
 	ug.POST("/edit", u.Edit)
 	ug.GET("/profile", u.Profile)
 }
@@ -67,6 +69,48 @@ func (u *UserHandler) SignUp(ctx *gin.Context) {
 
 	ctx.String(http.StatusOK, "注册成功")
 	fmt.Printf("req:%+v", req)
+}
+
+func (u *UserHandler) LoginJWT(ctx *gin.Context) {
+	type loginReq struct {
+		Email    string `json:"email" validate:"email"`
+		Password string `json:"password" validate:"required"`
+	}
+
+	var req loginReq
+	if err := ctx.Bind(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
+		return
+	}
+	user, err := u.svc.Login(ctx, domain.User{
+		Email:    req.Email,
+		Password: req.Password,
+	})
+	if err == service.ErrInvalidUserOrPassword {
+		ctx.String(http.StatusOK, "用户名或密码错误")
+		return
+	}
+	if user.ID == 0 {
+		ctx.String(http.StatusOK, "用户名或密码错误")
+		return
+	}
+	if err != nil {
+		ctx.String(http.StatusOK, "系统错误")
+		return
+	}
+
+	// 登录成功，获取sid, 设置sid
+	token := jwt.New(jwt.SigningMethodHS256)
+	tokenStr, err := token.SignedString([]byte("moyn8y9abnd7q4zkq2m73yw8tu9j5ixm"))
+	if err != nil {
+		ctx.String(http.StatusInternalServerError, "系统错误")
+		return
+	}
+	ctx.Header("x-jwt-token", tokenStr)
+	ctx.JSON(http.StatusOK, gin.H{
+		"msg": "登录成功",
+	})
+	return
 }
 
 func (u *UserHandler) Login(ctx *gin.Context) {

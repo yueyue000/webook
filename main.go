@@ -51,7 +51,7 @@ func initWebServer() *gin.Engine {
 		//AllowOrigins:     []string{"http://localhost:8080"},   // AllowOrigins参数与AllowOriginFunc参数用一个就可以，对应请求标头里的Origin
 		//AllowMethods:     []string{"GET", "POST", "OPTIONS"},  // 允许使用的方法，不设置允许所有的方法。
 		AllowHeaders:     []string{"Origin"},      // 对应响应头：Access-Control-Allow-Credentials
-		ExposeHeaders:    []string{"x-jwt-token"}, // 允许请求带x-jwt-token这个header
+		ExposeHeaders:    []string{"x-jwt-token"}, // 允许前端获取x-jwt-token这个header
 		AllowCredentials: true,                    // 是否允许带上用户认证信息（如：cookie），对应响应头：Access-Control-Allow-Credentials
 		AllowOriginFunc: func(origin string) bool {
 			if strings.HasPrefix(origin, "http://localhost") { // 开发环境用

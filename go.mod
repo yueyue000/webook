@@ -8,6 +8,7 @@ require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/go-sql-driver/mysql v1.7.0
+	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/stretchr/testify v1.8.3
 	golang.org/x/crypto v0.9.0
 	gorm.io/driver/mysql v1.5.1
