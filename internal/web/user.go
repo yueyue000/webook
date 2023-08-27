@@ -24,7 +24,8 @@ func (u *UserHandler) RegisterRoutes(s *gin.Engine) {
 	//ug.POST("/login", u.Login)
 	ug.POST("/login", u.LoginJWT)
 	ug.POST("/edit", u.Edit)
-	ug.GET("/profile", u.Profile)
+	//ug.GET("/profile", u.Profile)
+	ug.GET("/profile", u.ProfileJWT)
 }
 
 func NewUserHandler(svc *service.UserService) *UserHandler {
@@ -99,8 +100,12 @@ func (u *UserHandler) LoginJWT(ctx *gin.Context) {
 		return
 	}
 
+	claims := UserClaims{
+		Uid: user.ID,
+	}
+
 	// 登录成功，获取sid, 设置sid
-	token := jwt.New(jwt.SigningMethodHS256)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
 	tokenStr, err := token.SignedString([]byte("moyn8y9abnd7q4zkq2m73yw8tu9j5ixm"))
 	if err != nil {
 		ctx.String(http.StatusInternalServerError, "系统错误")
@@ -206,4 +211,28 @@ func (u *UserHandler) Profile(ctx *gin.Context) {
 		ctx.AbortWithStatus(http.StatusInternalServerError)
 	}
 	ctx.JSON(http.StatusOK, userDomain)
+}
+
+func (u *UserHandler) ProfileJWT(ctx *gin.Context) {
+	c, ok := ctx.Get("claims")
+	if !ok {
+		ctx.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+	claims, ok := c.(*UserClaims)
+	if !ok {
+		ctx.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	userDomain, err := u.svc.Profile(ctx, claims.Uid)
+	if err != nil {
+		ctx.AbortWithStatus(http.StatusInternalServerError)
+	}
+	ctx.JSON(http.StatusOK, userDomain)
+}
+
+type UserClaims struct {
+	jwt.RegisteredClaims
+	Uid int64
 }
