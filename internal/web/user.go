@@ -11,6 +11,7 @@ import (
 	"github.com/yueyue000/webook/internal/service"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 // UserHandler 定义所有跟user有关的路由
@@ -101,6 +102,10 @@ func (u *UserHandler) LoginJWT(ctx *gin.Context) {
 	}
 
 	claims := UserClaims{
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute)), // token过期的时间点
+			NotBefore: nil,                                             // token生效的时间点
+		},
 		Uid: user.ID,
 	}
 
@@ -232,6 +237,7 @@ func (u *UserHandler) ProfileJWT(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, userDomain)
 }
 
+// UserClaims 这里面尽量不放敏感信息
 type UserClaims struct {
 	jwt.RegisteredClaims
 	Uid int64
