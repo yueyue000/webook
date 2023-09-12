@@ -106,7 +106,8 @@ func (u *UserHandler) LoginJWT(ctx *gin.Context) {
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute)), // token过期的时间点
 			NotBefore: nil,                                             // token生效的时间点
 		},
-		Uid: user.ID,
+		Uid:       user.ID,
+		UserAgent: ctx.Request.UserAgent(),
 	}
 
 	// 登录成功，获取sid, 设置sid
@@ -240,5 +241,6 @@ func (u *UserHandler) ProfileJWT(ctx *gin.Context) {
 // UserClaims 这里面尽量不放敏感信息
 type UserClaims struct {
 	jwt.RegisteredClaims
-	Uid int64
+	Uid       int64
+	UserAgent string
 }

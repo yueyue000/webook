@@ -52,6 +52,11 @@ func (l *LoginJWTMiddleware) Build() gin.HandlerFunc {
 			ctx.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
+		// 这种场景说明有严重的安全问题，需要加监控。
+		if claims.UserAgent != ctx.Request.UserAgent() {
+			ctx.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
 
 		// 固定间隔时间刷新token，旧的未过期的token也是可以用的
 		now := time.Now()
