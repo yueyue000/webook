@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webook
+spec:
+  # 副本数量
+  replicas: 3
+  selector:
+    matchLabels:
+      app: webook-live
+  # 描述POD
+  template:
+    metadata:
+      name: webook-live
+      labels:
+        app: webook-live
+    # POD的具体信息
+    spec:
+      containers:
+        - name: webook
+          image: ly/webook-live:v0.0.1
+          ports:
+            - containerPort: 8080    # 与main.go里起服务的端口对应

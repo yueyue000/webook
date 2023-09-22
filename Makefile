@@ -6,6 +6,6 @@ docker:
 	# 交叉编译
 	@GOOS=linux GOARCH=arm go build -o webook .
 	# 删除镜像,-f:强制删除
-	@docker rmi -f ly/webook:v0.0.1
+	@docker rmi -f ly/webook-live:v0.0.1
 	# 打包镜像
-	@docker build -t ly/webook:v0.0.1 .
+	@docker build -t ly/webook-live:v0.0.1 .
