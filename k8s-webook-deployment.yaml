@@ -1,13 +1,12 @@
-apiVersion: apps/v1
+apiVersion: apps/v1       # 标识资源版本
 kind: Deployment
 metadata:
-  name: webook
-spec:
-  # 副本数量
-  replicas: 3
-  selector:
+  name: webook            # deployment的名称
+spec:                     # specification 规格说明
+  replicas: 3             # 副本数量，即3个POD
+  selector:               # 筛选期，定义如何查找要管理的POD
     matchLabels:
-      app: webook-live
+      app: webook-live    # 键值对映射
   # 描述POD
   template:
     metadata:
@@ -16,8 +15,8 @@ spec:
         app: webook-live
     # POD的具体信息
     spec:
-      containers:
-        - name: webook
-          image: ly/webook-live:v0.0.1
+      containers:         # 一个容器的定义
+        - name: webook    # 容器名
+          image: ly/webook-live:v0.0.1     #
           ports:
             - containerPort: 8080    # 与main.go里起服务的端口对应
