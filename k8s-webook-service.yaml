@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service   # Deployment没法从外部访问，需要将pod封装为一个逻辑上的服务，即Service
+metadata:
+  name: webook-live
+spec:
+  type: LoadBalancer   # 给selector里筛选出来的pod做负载均衡
+  selector:
+    app: webook-live
+  ports:
+    - protocol: TCP       # 这个端口监听什么协议
+      name: http          # 端口的名字，随便定义
+      port: 80            # 外部访问的端口
+      targetPort: 8080    # 转发到目标pod上的哪个端口
+
