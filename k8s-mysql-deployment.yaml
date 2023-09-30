@@ -1,0 +1,28 @@
+apiVersion: apps/v1       # 标识资源版本
+kind: Deployment
+metadata:
+  name: webook-live-mysql
+  labels:
+    app: webook-live-mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webook-live-mysql
+  template:
+    metadata:
+      name: webook-live-mysql
+      labels:
+        app: webook-live-mysql
+    spec:
+      containers:
+        - name: webook-live-mysql
+          image: mysql:8.0
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: root
+          imagePullPolicy: IfNotPresent     # 本地没有镜像
+          ports:
+            - containerPort: 3306           # 对外暴露的端口
+      restartPolicy: Always                 # 重启永远去拉新镜像
+
