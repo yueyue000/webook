@@ -1,0 +1,13 @@
+# pv => PersistentVolume
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mysql-local-pv
+spec:
+  storageClassName: suibian
+  capacity:      # 容量
+    storage: 1Gi
+  accessModes:   # 允许如何被访问
+    - ReadWriteOnce   # 可以被一个POD读写
+  hostPath:
+    path: "/mnt/live"
