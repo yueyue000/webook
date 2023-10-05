@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: webook-live-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: live.webook.com
+      http:
+        paths:
+          - backend:  # 请求路径前缀为"/"时，将请求转发到webook-live服务上，端口是：80
+              service:
+                name: webook-live     # 与k8s-webook-service.yaml里name对应
+                port:                 # 与k8s-webook-service.yaml里port对应
+                  number: 80
+            pathType: Prefix
+            path: /
+
