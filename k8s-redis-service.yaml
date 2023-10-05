@@ -7,7 +7,7 @@ spec:
     app: webook-live-redis
   ports:
     - protocol: TCP
-      port: 11479
-      targetPort: 6379
-      nodePort: 30003  # 外部访问端口范围：30000-32767
+      port: 11479       # service暴露出来的端口
+      targetPort: 6379  # pod暴露出来的redis端口
+      nodePort: 30003   # 节点暴露出来的端口，外部访问用这个端口，范围：30000-32767
   type: NodePort
