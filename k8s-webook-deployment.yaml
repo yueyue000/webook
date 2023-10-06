@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: webook            # deployment的名称
 spec:                     # specification 规格说明
-  replicas: 3             # 副本数量，即3个POD
+  replicas: 2             # 副本数量，即2个POD
   selector:               # 筛选期，定义如何查找要管理的POD
     matchLabels:
       app: webook-live    # 键值对映射
@@ -19,4 +19,4 @@ spec:                     # specification 规格说明
         - name: webook    # 容器名
           image: ly/webook-live:v0.0.1     #
           ports:
-            - containerPort: 8080    # 与main.go里起服务的端口对应
+            - containerPort: 8081    # 与main.go里起服务的端口对应

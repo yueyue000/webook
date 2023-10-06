@@ -7,9 +7,9 @@ package config
 
 var Config = config{
 	DB: DBConfig{
-		DSN: "root:root@tcp(webook-live-mysql:3309)/webook?charset=utf8mb4&parseTime=true",
+		DSN: "root:root@tcp(webook-live-mysql:3308)/webook?charset=utf8mb4&parseTime=true",
 	},
 	Redis: RedisConfig{
-		Addr: "webook-live-redis:11479",
+		Addr: "webook-live-redis:6380",
 	},
 }

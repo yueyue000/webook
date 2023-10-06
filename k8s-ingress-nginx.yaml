@@ -11,8 +11,8 @@ spec:
           - backend:  # 请求路径前缀为"/"时，将请求转发到webook-live服务上，端口是：80
               service:
                 name: webook-live     # 与k8s-webook-service.yaml里name对应
-                port:                 # 与k8s-webook-service.yaml里port对应
-                  number: 81
+                port:
+                  number: 81          # 与k8s-webook-service.yaml里port对应
             pathType: Prefix
             path: /
 

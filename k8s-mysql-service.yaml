@@ -7,7 +7,7 @@ spec:
     app: webook-live-mysql
   ports:
     - protocol: TCP
-      port: 3309         # 外部访问MySQL使用的端口
+      port: 3308         # 外部访问MySQL使用的端口
       targetPort: 3306   # 访问pod上部署MySQL的端口
       nodePort: 30002    # NodePort类型，外部访问MySQL用这个端口，port指定的端口不生效。可用端口范围30000-32767
   type: NodePort
