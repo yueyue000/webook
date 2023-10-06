@@ -12,7 +12,7 @@ spec:
               service:
                 name: webook-live     # 与k8s-webook-service.yaml里name对应
                 port:                 # 与k8s-webook-service.yaml里port对应
-                  number: 80
+                  number: 81
             pathType: Prefix
             path: /
 

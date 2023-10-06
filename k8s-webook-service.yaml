@@ -9,6 +9,6 @@ spec:
   ports:
     - protocol: TCP       # 这个端口监听什么协议
       name: http          # 端口的名字，随便定义
-      port: 80            # 外部访问的端口
+      port: 81            # 外部访问的端口
       targetPort: 8080    # 转发到目标pod上的哪个端口
 

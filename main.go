@@ -6,6 +6,7 @@ import (
 	"github.com/gin-contrib/sessions/memstore"
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
+	"github.com/yueyue000/webook/config"
 	"github.com/yueyue000/webook/internal/repository"
 	"github.com/yueyue000/webook/internal/repository/dao"
 	"github.com/yueyue000/webook/internal/service"
@@ -20,11 +21,10 @@ import (
 )
 
 func main() {
-	//db := initDB()
-	//server := initWebServer()
-	//u := initUser(db)
-	//u.RegisterRoutes(server)
-	server := gin.Default()
+	db := initDB()
+	server := initWebServer()
+	u := initUser(db)
+	u.RegisterRoutes(server)
 	server.GET("/hello", func(ctx *gin.Context) {
 		ctx.String(http.StatusOK, "hello, 你好")
 	})
@@ -32,7 +32,7 @@ func main() {
 }
 
 func initDB() *gorm.DB {
-	db, err := gorm.Open(mysql.Open("root:root@tcp(localhost:13316)/webook?charset=utf8mb4&parseTime=true"))
+	db, err := gorm.Open(mysql.Open(config.Config.DB.DSN))
 	if err != nil {
 		panic(err) // 初始化过程有问题直接panic
 	}
@@ -70,7 +70,7 @@ func initWebServer() *gin.Engine {
 	}))
 
 	redisClient := redis.NewClient(&redis.Options{
-		Addr: "localhost:6379",
+		Addr: config.Config.Redis.Addr,
 	})
 
 	// 基于redis实现滑动窗口限流。1分钟100次针对IP限流
