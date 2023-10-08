@@ -5,7 +5,7 @@ package config
 
 var Config = config{
 	DB: DBConfig{
-		DSN: "localhost:3306",
+		DSN: "root:root@tcp(localhost:3306)/webook?charset=utf8mb4&parseTime=true",
 	},
 	Redis: RedisConfig{
 		Addr: "localhost:6379",

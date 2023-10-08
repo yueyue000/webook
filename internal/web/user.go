@@ -103,8 +103,8 @@ func (u *UserHandler) LoginJWT(ctx *gin.Context) {
 
 	claims := UserClaims{
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute)), // token过期的时间点
-			NotBefore: nil,                                             // token生效的时间点
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 30)), // token过期的时间点,30分钟过期
+			NotBefore: nil,                                                  // token生效的时间点
 		},
 		Uid:       user.ID,
 		UserAgent: ctx.Request.UserAgent(),

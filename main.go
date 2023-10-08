@@ -2,17 +2,13 @@ package main
 
 import (
 	"github.com/gin-contrib/cors"
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/memstore"
 	"github.com/gin-gonic/gin"
-	"github.com/redis/go-redis/v9"
 	"github.com/yueyue000/webook/config"
 	"github.com/yueyue000/webook/internal/repository"
 	"github.com/yueyue000/webook/internal/repository/dao"
 	"github.com/yueyue000/webook/internal/service"
 	"github.com/yueyue000/webook/internal/web"
 	"github.com/yueyue000/webook/internal/web/middleware"
-	"github.com/yueyue000/webook/pkg/ginx/middlewares/ratelimit"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"net/http"
@@ -69,12 +65,11 @@ func initWebServer() *gin.Engine {
 		MaxAge: 12 * time.Hour, // preflity请求有效期，可以调小一点对应响应头：Access-Control-Max-Age
 	}))
 
-	redisClient := redis.NewClient(&redis.Options{
-		Addr: config.Config.Redis.Addr,
-	})
-
-	// 基于redis实现滑动窗口限流。1分钟100次针对IP限流
-	server.Use(ratelimit.NewBuilder(redisClient, time.Minute, 100).Build())
+	//redisClient := redis.NewClient(&redis.Options{
+	//	Addr: config.Config.Redis.Addr,
+	//})
+	//// 基于redis实现滑动窗口限流。1分钟100次针对IP限流
+	//server.Use(ratelimit.NewBuilder(redisClient, time.Minute, 100).Build())
 
 	// session存储使用的存储引擎: 内存存储
 	//store := cookie.NewStore([]byte("secret"))
@@ -85,9 +80,8 @@ func initWebServer() *gin.Engine {
 	//	panic(err)
 	//}
 
-	store := memstore.NewStore([]byte("dqC2oDoZ2noDoZ2n"), []byte("jW5FOm21NZoDoZ2n"))
-
-	server.Use(sessions.Sessions("mysession", store)) // 设置到cookie的name和value
+	//store := memstore.NewStore([]byte("dqC2oDoZ2noDoZ2n"), []byte("jW5FOm21NZoDoZ2n"))
+	//server.Use(sessions.Sessions("mysession", store)) // 设置到cookie的name和value
 
 	server.Use(middleware.NewLoginJWTMiddlewareBuilder().
 		IgnorePaths("/users/signup").
