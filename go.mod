@@ -3,6 +3,7 @@ module github.com/yueyue000/webook
 go 1.20
 
 require (
+	github.com/ecodeclub/ekit v0.0.8
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-contrib/sessions v0.0.5
 	github.com/gin-gonic/gin v1.9.1
@@ -11,6 +12,9 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/redis/go-redis/v9 v9.1.0
 	github.com/stretchr/testify v1.8.3
+	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.761
+	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/sms v1.0.761
+	go.uber.org/zap v1.26.0
 	golang.org/x/crypto v0.9.0
 	gorm.io/driver/mysql v1.5.1
 	gorm.io/gorm v1.25.3
@@ -41,9 +45,9 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/quasoft/memstore v0.0.0-20191010062613-2bce066d2b0b // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
+	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/arch v0.3.0 // indirect
 	golang.org/x/net v0.10.0 // indirect
 	golang.org/x/sys v0.8.0 // indirect
